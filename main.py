@@ -38,11 +38,16 @@ class Chatbot:
             "Query: {query_str}\n"
             "Answer: "
             "If the question is about IELTS Reading, the answer should be in the following format:"
-            "1. Title"
+            "1. Title sample 1"
             "2. Topic"
             "3. Type of questions"
             "4. Origin: Book Title and page details"
             "5. ID: Book ID"
+            "1. Title sample 2"
+            "2. Topic"
+            "3. Type of questions"
+            "4. Origin: Book Title and page details"
+            "5. ID: Book ID"           
             "If the question is about IELTS Speaking, print as it is"
         )
         self.qa_prompt = PromptTemplate(QA_PROMPT_TMPL)
@@ -80,7 +85,6 @@ class Chatbot:
         return self.query_engine.query(prompt)
 
 
-llm = Chatbot(data_dir= 'data')
 def Get_id(prompt):
     import re
     locs = [m.start() for m in re.finditer('ID', prompt)]
@@ -129,6 +133,8 @@ if "selected_conversation" not in st.session_state:
     st.session_state.selected_conversation = "Chat 1"
 if "menu_states" not in st.session_state:
     st.session_state.menu_states = {}  # Lưu trạng thái của menu tùy chọn
+if 'llm_model' not in st.session_state:
+    st.session_state.llm_model = Chatbot(data_dir= 'data')
 
 # Hàm hiển thị PDF
 def display_pdf(file_path):
@@ -143,7 +149,8 @@ def display_pdf(file_path):
             pdf_data = pdf_file.read()
 
         # Hiển thị toàn bộ PDF (cho phép cuộn)
-        pdf_viewer(input=pdf_data, width=800, height=600)
+            st.session_state.messages.append({"role": "assistant", "content": pdf_viewer(input=pdf_data, width=800, height=600)})
+            st.session_state.conversations[selected_chat] = st.session_state.messages
     except Exception as e:
         st.error(f"Có lỗi xảy ra khi hiển thị PDF: {str(e)}")
 
@@ -227,9 +234,8 @@ if selected_chat:
         st.markdown(f'<div class="user-message">{prompt}</div>', unsafe_allow_html=True)
         st.session_state.messages.append({"role": "user", "content": prompt})
 
-        llm_reply = llm.query(prompt)
+        llm_reply = st.session_state.llm_model.query(prompt)
         llm_reply = str(llm_reply).replace('*','')
-        # Bot response (repeating the prompt)
         display_typing_message(llm_reply)
 
         ids = Get_id(llm_reply)

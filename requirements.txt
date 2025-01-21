@@ -1,20 +1,22 @@
-llama-cloud >= 0.1.6
-llama-index >= 0.12.5
-llama-index-agent-openai >= 0.4.0
-llama-index-cli >= 0.4.0
-llama-index-core >= 0.12.5
-llama-index-embeddings-huggingface >= 0.4.0
-llama-index-embeddings-openai >= 0.3.1
-llama-index-indices-managed-llama-cloud >= 0.6.3
-llama-index-legacy >= 0.9.48.post4
-llama-index-llms-gemini >= 0.4.0
-llama-index-llms-openai >= 0.3.4
-llama-index-multi-modal-llms-openai >= 0.4.0
-llama-index-program-openai >= 0.3.1
-llama-index-question-gen-openai >= 0.3.0
-llama-index-readers-file >= 0.4.1
-llama-index-readers-json >= 0.3.0
-llama-index-readers-llama-parse >= 0.4.0
-llama-parse >= 0.5.17
+llama-cloud
+llama-index
+llama-index-agent-openai
+llama-index-cli
+llama-index-core
+llama-index-embeddings-huggingface
+llama-index-embeddings-openai
+llama-index-indices-managed-llama-cloud
+llama-index-legacy
+llama-index-llms-gemini
+llama-index-llms-openai
+llama-index-multi-modal-llms-openai
+llama-index-program-openai
+llama-index-question-gen-openai
+llama-index-readers-file
+llama-index-readers-json
+llama-index-readers-llama-parse
+llama-parse
 llama-index-embeddings-gemini
+llama-index-vector-stores-faiss
 streamlit
+faiss-cpu
