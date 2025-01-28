@@ -2,19 +2,21 @@ import streamlit as st
 import time
 import pathlib
 from streamlit_pdf_viewer import pdf_viewer
-import os
+import faiss
 
 import os
 import json
 from llama_index.llms.gemini import Gemini
-from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, Document, PromptTemplate
+from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, Document, PromptTemplate, StorageContext
 from llama_index.core.node_parser import TokenTextSplitter, JSONNodeParser
 from llama_index.readers.json import JSONReader
 from llama_index.embeddings.gemini import GeminiEmbedding
+from llama_index.vector_stores.faiss import FaissVectorStore
+from llama_index.core import Settings
 
 class Chatbot:
     def __init__(self, data_dir):
-        google_gemini_api = 'AIzaSyCiEDbg9BZVP9lAg9Q2HCFXNgEBCNHS0Zw'
+        google_gemini_api = 'PLEASE ADD GEMINI API KEY HERE'
         os.environ["GOOGLE_API_KEY"] = google_gemini_api
         os.environ["MODEL_NAME"] = "models/gemini-1.5-flash-latest"
         # LLM model
@@ -51,6 +53,13 @@ class Chatbot:
             "If the question is about IELTS Speaking, print as it is"
         )
         self.qa_prompt = PromptTemplate(QA_PROMPT_TMPL)
+        self.vector_store = FaissVectorStore(faiss_index=faiss.IndexFlatL2(768))
+        self.storage_context = StorageContext.from_defaults(vector_store=self.vector_store)
+        Settings.llm = self.llm
+        Settings.embed_model = self.embed_model
+        Settings.node_parser = self.splitter
+        Settings.num_output = 512
+        Settings.context_window = 3900
         self.insert_data(data_dir)
         self.update_engine()
 
@@ -72,8 +81,8 @@ class Chatbot:
         documents = self.read_data(data_dir)
         nodes = self.splitter.get_nodes_from_documents(documents)
         print('Number of nodes:', len(nodes))
-        self.index = VectorStoreIndex(nodes, embed_model=self.embed_model)
-        self.index.storage_context.persist(persist_dir="")
+        self.index = VectorStoreIndex.from_documents(documents, storage_context=self.storage_context)
+        self.index.storage_context.persist(persist_dir=os.getcwd())
 
     def update_engine(self):
         self.query_engine = self.index.as_query_engine(similarity_top_k=10, llm=self.llm)
